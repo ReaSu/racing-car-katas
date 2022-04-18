@@ -5,22 +5,26 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class HtmlTextConverter {
-	private String fullFilenameWithPath;
-	private String contents = "";
+	private Original original;
 
 	public HtmlTextConverter(String fullFilenameWithPath) {
-		this.fullFilenameWithPath = fullFilenameWithPath;
+		this.original = new Original(fullFilenameWithPath);
 	}
 
-	public HtmlTextConverter(String contents, String fullFilenameWithPath) {
-		this.fullFilenameWithPath = fullFilenameWithPath;
-		this.contents = contents;
+	public HtmlTextConverter(Original original) {
+		this.original = original;
 	}
 
 	public String convertToHtml() throws IOException {
-		if (contents == "") {
-			contents = readFile();
-		}
+		/*
+		 * should this decision be made where the file is actually read? The text
+		 * converter could then be agnostic towards the kind of input it gets.
+		 */
+		String contents = original.contents == "" ? readFile(original.fullFilenameWithPath) : original.contents;
+		// do I pass the whole object, and return the whole object?
+		// do I pass just the file name and return just the contents?
+		// should the method be void, with no parameters and use the object's original?
+		// or something else entirely?
 		String[] lines = contents.split("\n");
 		String html = "";
 		for (String line : lines) {
@@ -35,7 +39,7 @@ public class HtmlTextConverter {
 		return html;
 	}
 
-	private String readFile() throws IOException {
+	private String readFile(String fullFilenameWithPath) throws IOException {
 		String contents = "";
 		BufferedReader reader = new BufferedReader(new FileReader(fullFilenameWithPath));
 		String line = reader.readLine();
@@ -49,6 +53,6 @@ public class HtmlTextConverter {
 	}
 
 	public String getFilename() {
-		return this.fullFilenameWithPath;
+		return this.original.fullFilenameWithPath;
 	}
 }
