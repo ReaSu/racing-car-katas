@@ -5,32 +5,34 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class HtmlTextConverter {
-	private Original original;
+	private Input input;
 
 	public HtmlTextConverter(String fullFilenameWithPath) {
-		this.original = new Original(fullFilenameWithPath);
+		this.input = new Input(fullFilenameWithPath);
 	}
 
-	public HtmlTextConverter(Original original) {
-		this.original = original;
+	public HtmlTextConverter(Input input) {
+		this.input = input;
 	}
 
+	/* should this exception be caught and handled in this class?
+	 * or at least replaced by a more specific exception? 
+	 */
 	public String convertToHtml() throws IOException {
-		/*
-		 * should this decision be made where the file is actually read? The text
-		 * converter could then be agnostic towards the kind of input it gets.
-		 */
-		String contents = original.contents == "" ? readFile(original.fullFilenameWithPath) : original.contents;
-		// do I pass the whole object, and return the whole object?
-		// do I pass just the file name and return just the contents?
-		// should the method be void, with no parameters and use the object's original?
-		// or something else entirely?
-		String[] lines = contents.split("\n");
+		String[] lines = getLines();
 		String html = "";
 		for (String line : lines) {
 			html += convert(line);
 		}
 		return html;
+	}
+
+	private String[] getLines() throws IOException {
+		if (input.contents == "") {
+			input.contents = readFile(input.fullFilenameWithPath);
+		}
+		String[] lines = input.contents.split("\n");
+		return lines;
 	}
 
 	private String convert(String line) {
@@ -42,17 +44,22 @@ public class HtmlTextConverter {
 	private String readFile(String fullFilenameWithPath) throws IOException {
 		String contents = "";
 		BufferedReader reader = new BufferedReader(new FileReader(fullFilenameWithPath));
+		contents = read(contents, reader);
+		reader.close();
+		return contents;
+	}
+
+	private String read(String contents, BufferedReader reader) throws IOException {
 		String line = reader.readLine();
 		while (line != null) {
 			contents += line;
 			contents += '\n';
 			line = reader.readLine();
 		}
-		reader.close();
 		return contents;
 	}
 
 	public String getFilename() {
-		return this.original.fullFilenameWithPath;
+		return this.input.fullFilenameWithPath;
 	}
 }

@@ -16,11 +16,25 @@ public class HtmlTextConverterTest {
     }
     
     @Test
+    public void readFromFileShouldconvertContents() {
+        String fullFilenameWithPath = "/home/reasu/dev/katas/Racing-Car-Katas/Java/TextConverter/src/main/java/resources/textfile.txt";
+		HtmlTextConverter converter = new HtmlTextConverter(fullFilenameWithPath);
+		String expected = "some &quot;text&quot; file contents<br />a &lt; b &amp;&amp; b &gt; a<br />";
+    	String html = "";
+    	try {
+			html = converter.convertToHtml();
+		} catch (IOException e) {
+			e.getMessage();
+		}
+    	assertEquals(html, expected);
+    }
+    
+    @Test
     public void passContentsShouldReturnCorrectFileName() {
     	String contents = "some \"text\" contents\na < b && b > a\n";
     	String filename = "randomFileName.txt";
     	
-    	HtmlTextConverter converter = new HtmlTextConverter(new Original(contents, filename));
+    	HtmlTextConverter converter = new HtmlTextConverter(new Input(contents, filename));
     	assertEquals(filename, converter.getFilename());
     }
     
@@ -29,7 +43,7 @@ public class HtmlTextConverterTest {
     	String contents = "some \"text\" contents\na < b && b > a\n";
     	String filename = "randomFileName.txt";
     	String expected = "some &quot;text&quot; contents<br />a &lt; b &amp;&amp; b &gt; a<br />";
-    	HtmlTextConverter converter = new HtmlTextConverter(new Original(contents, filename));
+    	HtmlTextConverter converter = new HtmlTextConverter(new Input(contents, filename));
     	String html = "";
     	try {
 			html = converter.convertToHtml();
